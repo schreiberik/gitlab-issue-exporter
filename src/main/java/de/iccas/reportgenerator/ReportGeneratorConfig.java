@@ -9,11 +9,11 @@ import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 
 /**
- *
+ * this class provides functions to access the settings made in the config.properties
  */
 public class ReportGeneratorConfig {
 
-    private static ReportGeneratorConfig instance;
+    private static ReportGeneratorConfig instance; //singleton instance
     Configuration config;
 
     public ReportGeneratorConfig(String configFileName) {
@@ -70,6 +70,9 @@ public class ReportGeneratorConfig {
         return config.getString("import.endDay") + " 23:59:59";
     }
 
+    public String getDocumentFileName() {
+        return config.getString("document.fileName");
+    }
 
     public int[] getProjectIDs() {
         String[] projectIdStr = config.getStringArray("gitlab.projectIDs");

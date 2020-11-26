@@ -32,7 +32,8 @@ public class ReportGenerator {
 
         //Report Generation
         DocumentGenerator documentGenerator = new DocumentGenerator();
-        documentGenerator.generateDocument(gitlabData, "SprintReport.docx");
+        String fileName = ReportGeneratorConfig.getInstance().getDocumentFileName();
+        documentGenerator.generateDocument(gitlabData, fileName);
     }
 
     /**

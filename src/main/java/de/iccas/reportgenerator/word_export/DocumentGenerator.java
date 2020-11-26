@@ -16,7 +16,8 @@ public class DocumentGenerator {
 
     protected final ch.qos.logback.classic.Logger logger = (Logger) LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    /**getSimpleName
+    /**
+     * getSimpleName
      * generates a report document from the data imported from GitLab
      */
     public DocumentGenerator() {
@@ -31,12 +32,10 @@ public class DocumentGenerator {
     }
 
     /**
-     *
      * @param gitlabData the imported data from GitLab
-     * @param fileName the name of the file to be generated
+     * @param fileName   the name of the file to be generated
      */
-    public void generateDocument(GitlabData gitlabData, String fileName)
-    {
+    public void generateDocument(GitlabData gitlabData, String fileName) {
         //generate the actual report document from the template
         sprintReportTemplate = new SprintReportTemplate(wordprocessingMLPackage, gitlabData);
         sprintReportTemplate.generateDocument();

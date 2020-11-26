@@ -1,4 +1,4 @@
 /*.docx
 /.idea/
 /target/
-!/src/main/resources/config.properties
+/src/main/resources/config.properties
