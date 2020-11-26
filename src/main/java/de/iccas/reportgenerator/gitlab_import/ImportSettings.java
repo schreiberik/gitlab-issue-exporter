@@ -72,4 +72,12 @@ public class ImportSettings {
         }
         return ImportSettings.instance;
     }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
 }

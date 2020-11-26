@@ -11,8 +11,6 @@ import org.gitlab4j.api.models.Issue;
 import org.gitlab4j.api.models.Project;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -52,7 +50,8 @@ public class GitlabImporter {
     }
 
     /**
-     * Imports all issues and events that have been created, edited or closed within the given time frame
+     * Imports all issues and events that have been created, edited or closed within the given time frame specified
+     * in the configuration file
      *
      * @return GitlabData object, holding a list of all issues and events
      */
@@ -86,7 +85,7 @@ public class GitlabImporter {
                     List<Event> closedEvents = getIssueEventsFromProject(project, Constants.ActionType.CLOSED);
                     events.addAll(closedEvents);
 
-                    gitlabData.getEventsByProject().put(projectID, events);
+                    gitlabData.getEventsByProjectId().put(projectID, events);
 
                 } else {
                     logger.error("Could not find any project with id: " + projectID + ". Skipping to next project.");
@@ -148,28 +147,48 @@ public class GitlabImporter {
         return getIssuesFromProject(Integer.valueOf(projectID));
     }
 
-    //Events //Todo
+    /**
+     * Retrieves all issue event for a specific project and issue type that also occured within the timeframe
+     * specified in the configuration file
+     *
+     * @param project
+     * @param actionType
+     * @return
+     */
     List<Event> getIssueEventsFromProject(Project project, Constants.ActionType actionType) {
 
         List<Event> projectEvents = new ArrayList<>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        df.setTimeZone(TimeZone.getDefault());
-        try {
-            Date startDate = df.parse(ReportGeneratorConfig.getInstance().getImportStartDate());
-            Date endDate = df.parse(ReportGeneratorConfig.getInstance().getImportEndDate());
-            projectEvents = gitLabApi.getEventsApi().getProjectEvents(project.getId(), actionType, Constants.TargetType.ISSUE, endDate, startDate, Constants.SortOrder.ASC);
 
-        } catch (ParseException | GitLabApiException e) {
+        try {
+            projectEvents = gitLabApi.getEventsApi().getProjectEvents(
+                    project.getId(),
+                    actionType,
+                    Constants.TargetType.ISSUE,
+                    importSettings.getEndDate(),
+                    importSettings.getStartDate(),
+                    Constants.SortOrder.ASC
+            );
+
+        } catch (GitLabApiException e) {
             e.printStackTrace();
         }
 
         logger.info("Retrieved " + projectEvents.size() + " events with type \"" + actionType.toValue() + "\" for project " + project.getName());
+
         return projectEvents;
     }
 
-    //Discussion //TODO
+    /**
+     * Retrieves all discussions of an issue
+     *
+     * @param project the related project
+     * @param issueID the related issue
+     * @return a list of all related discussions
+     */
     public List<Discussion> getDiscussions(Project project, int issueID) {
+
         List<Discussion> issueDiscussions = new ArrayList<>();
+
         try {
             issueDiscussions = gitLabApi.getDiscussionsApi().getIssueDiscussions(project.getId(), issueID);
         } catch (GitLabApiException e) {
@@ -177,11 +196,13 @@ public class GitlabImporter {
         }
 
         logger.info("Retrieved " + issueDiscussions.size() + " for project " + project.getName());
+
         return issueDiscussions;
     }
 
     /**
      * Checks if the project for a given project id exists in GitLab
+     *
      * @param projectID the id of the project
      * @return true if the project exists, false otherwise
      */

@@ -1,5 +1,6 @@
 package de.iccas.reportgenerator.gitlab_import;
 
+import org.gitlab4j.api.models.Discussion;
 import org.gitlab4j.api.models.Event;
 import org.gitlab4j.api.models.Issue;
 import org.gitlab4j.api.models.Project;
@@ -14,28 +15,31 @@ import java.util.Map;
 public class GitlabData {
 
     private Map<Project, List<Issue>> issuesByProject;
-    private Map<Integer, List<Event>> eventsByProject;
+    private Map<Integer, List<Event>> eventsByProjectId;
+    private Map<Integer, Discussion> discussionsByIssueId;
 
+    /**
+     * default constructor
+     */
     public GitlabData() {
         this.issuesByProject = new HashMap<>();
-        this.eventsByProject = new HashMap<>(); //todo
+        this.eventsByProjectId = new HashMap<>();
+        this.discussionsByIssueId = new HashMap<>();
     }
 
     /**
-     *
-     * @param issuesByProject the mapping of each project and the according issue list
-     * @param eventsByProject //todo
+     * constructor
+     * @param issuesByProject all imported issues grouped by project
+     * @param eventsByProjectId all imported event grouped by project id
+     * @param discussionsByIssueId all imported discussions grouped by issue id
      */
-    public GitlabData(Map<Project, List<Issue>> issuesByProject, Map<Integer, List<Event>> eventsByProject) {
+    public GitlabData(Map<Project, List<Issue>> issuesByProject, Map<Integer, List<Event>> eventsByProjectId, Map<Integer, Discussion> discussionsByIssueId) {
 
         this.issuesByProject = issuesByProject;
-        this.eventsByProject = eventsByProject;
+        this.eventsByProjectId = eventsByProjectId;
+        this.discussionsByIssueId = discussionsByIssueId;
     }
 
-    /**
-     *
-     * @return
-     */
     public Map<Project, List<Issue>> getIssuesByProject() {
         return issuesByProject;
     }
@@ -44,19 +48,19 @@ public class GitlabData {
         this.issuesByProject = issuesByProject;
     }
 
-    /**
-     *
-     * @return
-     */
-    public Map<Integer, List<Event>> getEventsByProject() {
-        return eventsByProject;
+    public Map<Integer, List<Event>> getEventsByProjectId() {
+        return eventsByProjectId;
     }
 
-    /**
-     *
-     * @param eventsByProject
-//     */
-    public void setEventsByProject(Map<Integer, List<Event>> eventsByProject) {
-        this.eventsByProject = eventsByProject;
+    public void setEventsByProjectId(Map<Integer, List<Event>> eventsByProjectId) {
+        this.eventsByProjectId = eventsByProjectId;
+    }
+
+    public Map<Integer, Discussion> getDiscussionsByIssueId() {
+        return discussionsByIssueId;
+    }
+
+    public void setDiscussionsByIssueId(Map<Integer, Discussion> discussionsByIssueId) {
+        this.discussionsByIssueId = discussionsByIssueId;
     }
 }
