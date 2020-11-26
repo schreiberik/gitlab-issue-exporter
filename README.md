@@ -11,3 +11,5 @@ The tool comes with a config file, where you can specify various settings:
 It is using the GitLabApi Library for data import and Docx4j for document generation.
 Since there might be people with the same problem I had some weeks ago, I decided to share my work here. Feel free to use or edit the program to your needs.
 There are still some minor imperfections I noted as ToDo in the ReportGenerator.java (main file)
+
+To start open the config_template.properties and add login data for your repository etc. When finished rename the file to config.properties and start the tool via main-method in ReportGenerator.java
