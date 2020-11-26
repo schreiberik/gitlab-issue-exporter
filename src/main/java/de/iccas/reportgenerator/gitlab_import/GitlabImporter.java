@@ -15,22 +15,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Retrieves data from GitLab by utilizing the GitLabApi.
+ * Filters can be set with help of ImportSettings to specify which GitLab Issues are to be retrieved
+ */
 public class GitlabImporter {
 
     protected final ch.qos.logback.classic.Logger logger = (Logger) LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     private static GitlabImporter instance; //singleton instance
     private GitlabData gitlabData;
-    private GitLabApi gitLabConnection;
+    private GitLabApi gitLabApi;
     private ImportSettings importSettings;
 
     private GitlabImporter(String url, String token) {
 
-        importSettings = ImportSettings.getInstance();
-        gitLabConnection = new GitLabApi(url, token);
-        logger.info("Connected successfully to " + url);
+        gitLabApi = new GitLabApi(url, token); //api to access GitLab data
+        importSettings = ImportSettings.getInstance(); //import filter settings
+        gitlabData = new GitlabData(); //imported data is stored here
 
-        gitlabData = new GitlabData();
+        logger.info("Connected successfully to " + url);
     }
 
     /**
@@ -47,51 +51,83 @@ public class GitlabImporter {
         return GitlabImporter.instance;
     }
 
-    public void importAll() throws GitLabApiException {
+    /**
+     * Imports all issues and events that have been created, edited or closed within the given time frame
+     *
+     * @return GitlabData object, holding a list of all issues and events
+     */
+    public GitlabData completeImport() {
 
         logger.info("Starting import...");
 
+        try {
 
+            for (Integer projectID : ReportGeneratorConfig.getInstance().getProjectIDs()) { //iterate over all projects
 
-        for (Integer projectID : ReportGeneratorConfig.getInstance().getProjectIDs()) {
+                Project project = gitLabApi.getProjectApi().getProject(projectID);
 
-            Project project = gitLabConnection.getProjectApi().getProject(projectID);
+                if (project != null) {
 
-            if (project != null) {
-                List<Issue> issueList = getIssuesFromProject(project);
-                gitlabData.getIssuesByProject().put(project, issueList);
+                    //get all issues of the project
+                    List<Issue> issueList = getIssuesFromProject(project);
+                    gitlabData.getIssuesByProject().put(project, issueList);
 
-                List<Event> events = new ArrayList<>();
+                    List<Event> events = new ArrayList<>();
 
-                List<Event> newEvents = getIssueEventsFromProject(project, Constants.ActionType.CREATED);
-                events.addAll(newEvents);
+                    //get all events that where newly created within the given time frame
+                    List<Event> newEvents = getIssueEventsFromProject(project, Constants.ActionType.CREATED);
+                    events.addAll(newEvents);
 
-                List<Event> updateEvents = getIssueEventsFromProject(project, Constants.ActionType.UPDATED);
-                events.addAll(updateEvents);
+                    //get all events that where edited within the given time frame
+                    List<Event> updateEvents = getIssueEventsFromProject(project, Constants.ActionType.UPDATED);
+                    events.addAll(updateEvents);
 
-                List<Event> closeEvents = getIssueEventsFromProject(project, Constants.ActionType.CLOSED);
-                events.addAll(closeEvents);
+                    //get all events that where closed within the given time frame
+                    List<Event> closedEvents = getIssueEventsFromProject(project, Constants.ActionType.CLOSED);
+                    events.addAll(closedEvents);
 
-                gitlabData.getEventsByProject().put(projectID, events);
+                    gitlabData.getEventsByProject().put(projectID, events);
 
-            } else {
-                logger.error("Could not find any project with id: " + projectID + ". Skipping to next project.");
-                continue;
+                } else {
+                    logger.error("Could not find any project with id: " + projectID + ". Skipping to next project.");
+                    continue;
+                }
             }
+
+        } catch (GitLabApiException e) {
+            e.printStackTrace();
         }
+
+        return gitlabData;
     }
 
+    /**
+     * retrieves all issues that are associated to a specified project and have been updated within the
+     * timeframe specified in the configuration file
+     *
+     * @param project the GitLab project for which all issues shall be imported
+     * @return all associated issues as list
+     * @throws GitLabApiException
+     */
     public List<Issue> getIssuesFromProject(Project project) throws GitLabApiException {
 
-        List<Issue> issueList = gitLabConnection.getIssuesApi().getIssues(project.getId(), importSettings.getUpdateFilter());
+        List<Issue> issueList = gitLabApi.getIssuesApi().getIssues(project.getId(), importSettings.getUpdateFilter());
         logger.info("Retrieved " + issueList.size() + " issues for project " + project.getName());
 
         return issueList;
     }
 
+    /**
+     * retrieves all issues that are associated to a specified project and have been updated within the
+     * timeframe specified in the configuration file
+     *
+     * @param projectID the GitLab project ID for which all issues shall be imported
+     * @return all associated issues as list
+     * @throws GitLabApiException
+     */
     public List<Issue> getIssuesFromProject(int projectID) throws GitLabApiException {
 
-        Project project = gitLabConnection.getProjectApi().getProject(projectID);
+        Project project = gitLabApi.getProjectApi().getProject(projectID);
         if (project == null) {
             logger.error("Could not find project with ID: " + projectID);
             return null;
@@ -99,10 +135,19 @@ public class GitlabImporter {
         return getIssuesFromProject(project);
     }
 
+    /**
+     * retrieves all issues that are associated to a specified project and have been updated within the
+     * timeframe specified in the configuration file
+     *
+     * @param projectID the GitLab project ID as String for which all issues shall be imported
+     * @return all associated issues as list
+     * @throws GitLabApiException
+     */
     public List<Issue> getIssuesFromProject(String projectID) throws GitLabApiException {
 
         return getIssuesFromProject(Integer.valueOf(projectID));
     }
+
     //Events //Todo
     List<Event> getIssueEventsFromProject(Project project, Constants.ActionType actionType) {
 
@@ -112,7 +157,7 @@ public class GitlabImporter {
         try {
             Date startDate = df.parse(ReportGeneratorConfig.getInstance().getImportStartDate());
             Date endDate = df.parse(ReportGeneratorConfig.getInstance().getImportEndDate());
-            projectEvents = gitLabConnection.getEventsApi().getProjectEvents(project.getId(), actionType, Constants.TargetType.ISSUE, endDate, startDate, Constants.SortOrder.ASC);
+            projectEvents = gitLabApi.getEventsApi().getProjectEvents(project.getId(), actionType, Constants.TargetType.ISSUE, endDate, startDate, Constants.SortOrder.ASC);
 
         } catch (ParseException | GitLabApiException e) {
             e.printStackTrace();
@@ -122,12 +167,11 @@ public class GitlabImporter {
         return projectEvents;
     }
 
-    //Discussion
-    public List<Discussion> getDiscussions(Project project, int issueID)
-    {
+    //Discussion //TODO
+    public List<Discussion> getDiscussions(Project project, int issueID) {
         List<Discussion> issueDiscussions = new ArrayList<>();
         try {
-            issueDiscussions = gitLabConnection.getDiscussionsApi().getIssueDiscussions(project.getId(), issueID);
+            issueDiscussions = gitLabApi.getDiscussionsApi().getIssueDiscussions(project.getId(), issueID);
         } catch (GitLabApiException e) {
             e.printStackTrace();
         }
@@ -136,11 +180,15 @@ public class GitlabImporter {
         return issueDiscussions;
     }
 
-    private boolean getProject(int projectID)
-    {
+    /**
+     * Checks if the project for a given project id exists in GitLab
+     * @param projectID the id of the project
+     * @return true if the project exists, false otherwise
+     */
+    private boolean isProjectValid(int projectID) {
         Project project = null;
         try {
-            project = gitLabConnection.getProjectApi().getProject(projectID);
+            project = gitLabApi.getProjectApi().getProject(projectID);
         } catch (GitLabApiException e) {
             e.printStackTrace();
         }
@@ -150,7 +198,6 @@ public class GitlabImporter {
         }
         return true;
     }
-
 
     public static GitLabApi getGitLabConnection() {
         return GitlabImporter.getGitLabConnection();

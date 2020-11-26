@@ -8,7 +8,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-//ToDo: in andere Klassen auslagern
+/**
+ * Settings for GitLab Imports to allow filtering of imported data
+ */
 public class ImportSettings {
 
     private static ImportSettings instance; //singleton instance
@@ -20,9 +22,11 @@ public class ImportSettings {
     private ImportSettings() {
         try {
 
-            //import entities from midnight to midnight of the specified days
+            //date format
             df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             df.setTimeZone(TimeZone.getDefault());
+
+            //start and end date of the import
             startDate = df.parse(ReportGeneratorConfig.getInstance().getImportStartDate());
             endDate = df.parse(ReportGeneratorConfig.getInstance().getImportEndDate());
 
