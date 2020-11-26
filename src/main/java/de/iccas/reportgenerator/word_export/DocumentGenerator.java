@@ -8,12 +8,16 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.wml.*;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Generates document with docx4j according to the provided document template and fills it with the previously imported data
+ */
 public class DocumentGenerator {
 
     private ObjectFactory objectFactory;
     private WordprocessingMLPackage wordprocessingMLPackage;
     private DocumentTemplate sprintReportTemplate;
 
+    //Logback Logger
     protected final ch.qos.logback.classic.Logger logger = (Logger) LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     /**

@@ -16,34 +16,40 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Basic template class for word documents. Extend this class to create your own templates, e.g. SprintReportTemplate
+ * This class contains various functions to ease the filtering and formatting of imported data
+ */
 public abstract class DocumentTemplate {
     protected ObjectFactory objectFactory;
     protected WordprocessingMLPackage wordprocessingMLPackage;
     protected MainDocumentPart mainDocumentPart;
     protected GitlabData gitlabData;
-
     protected int writableWidthTwips;
 
+    //Logback Logger
+    protected final ch.qos.logback.classic.Logger logger = (Logger) LoggerFactory.getLogger(this.getClass().getSimpleName());
+
     /**
-     * basic template class for word documents. extend this class to create your own templates. it contains various functions to ease the formatting of your template
-     * @param wordprocessingMLPackage
-     * @param gitlabData
+     * Constructor
+     *
+     * @param wordprocessingMLPackage the docx4j word processing package
+     * @param gitlabData the imported GitLab data
      */
-    public DocumentTemplate(WordprocessingMLPackage wordprocessingMLPackage, GitlabData gitlabData)
-    {
+    public DocumentTemplate(WordprocessingMLPackage wordprocessingMLPackage, GitlabData gitlabData) {
         this.wordprocessingMLPackage = wordprocessingMLPackage;
         this.gitlabData = gitlabData;
         objectFactory = Context.getWmlObjectFactory();
 
+        //get the page dimensions to set table cell width later on
         writableWidthTwips = wordprocessingMLPackage.getDocumentModel().getSections().get(0).getPageDimensions().getWritableWidthTwips();
     }
-
-    protected final ch.qos.logback.classic.Logger logger = (Logger) LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     public abstract void generateDocument();
 
     /**
      * creates or overwrites a file in the root path on the file system. if overwriting, make sure to close the file befor running. otherwise an exception will be thrown
+     *
      * @param fileName the name of the file to be created / overwritten
      */
     public void generateReportFile(String fileName) {
@@ -79,6 +85,7 @@ public abstract class DocumentTemplate {
 
     /**
      * converts a list of assignees into a single string containing the comma separated names of all assignees in the list
+     *
      * @param values a list of assignees
      * @return the string containing the assignees names separated by commas
      */
@@ -137,11 +144,11 @@ public abstract class DocumentTemplate {
 
     /**
      * converts and rounds a number of seconds to hours for human readable formats (gitlab time estimation is saved in seconds)
+     *
      * @param seconds time estimation in seconds
      * @return conversion of time estimation in hours
      */
-    protected int secondsToHours(int seconds)
-    {
+    protected int secondsToHours(int seconds) {
         return Math.round((seconds / 60) / 60);
     }
 

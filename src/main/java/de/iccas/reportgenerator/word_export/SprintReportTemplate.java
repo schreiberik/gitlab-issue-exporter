@@ -12,8 +12,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-//TODO Text in externe Config auslagern -> siehe EOS language files
-
 /**
  * Template for the sprint review document
  */
@@ -25,32 +23,34 @@ public class SprintReportTemplate extends DocumentTemplate {
 
     @Override
     public void generateDocument() {
+
         this.mainDocumentPart = wordprocessingMLPackage.getMainDocumentPart();
 
+        //Title
         mainDocumentPart.addStyledParagraphOfText("Title", "Sprint Report");
 
+        //Issues
         Map<Project, List<Issue>> issuesByProject = gitlabData.getIssuesByProject();
-
         for (Project key : issuesByProject.keySet()) {
 
             //skip projects without any issues in the defined time frame
             if (issuesByProject.get(key).isEmpty())
                 continue;
 
+            //Project title caption
             Text projectTitleText = objectFactory.createText();
             projectTitleText.setValue("Projekt " + key.getName() + ":");
 
+            //Project title font size
             RPr rpr = objectFactory.createRPr();
             BooleanDefaultTrue b = new BooleanDefaultTrue();
             rpr.setB(b);
             HpsMeasure s26pt = Context.getWmlObjectFactory().createHpsMeasure();
             s26pt.setVal(BigInteger.valueOf(26));
             rpr.setSz(s26pt);
-
             R projectTitleRun = objectFactory.createR();
             projectTitleRun.getContent().add(projectTitleText);
             projectTitleRun.setRPr(rpr);
-
             P projectTitleParagraph = objectFactory.createP();
             projectTitleParagraph.getContent().add(projectTitleRun);
 
@@ -58,12 +58,11 @@ public class SprintReportTemplate extends DocumentTemplate {
 
             for (Issue issue : issuesByProject.get(key)) {
 
-//                mainDocumentPart.addParagraphOfText(generateIssueParagraph(issue));
                 mainDocumentPart.addObject(generateIssueMetaInfTable(issue));
                 mainDocumentPart.addObject(generateIssueDescriptionTable(issue));
                 mainDocumentPart.addObject(generateIssueProgressTable(issue));
                 mainDocumentPart.addObject(generateIssueDeliverableTable(issue));
-                mainDocumentPart.addParagraphOfText("");
+                mainDocumentPart.addParagraphOfText(""); //empty paragraph to separeate the tables from each other
             }
         }
     }
@@ -143,12 +142,11 @@ public class SprintReportTemplate extends DocumentTemplate {
         Tc row1Col1 = (Tc) row1.getContent().get(0);
         P row1Col1Para1 = (P) row1Col1.getContent().get(0);
 
-        // Issue description
+        // Issue description / details
         R descriptionLabel = Docx4jWrapper.generateStyledRun("Durchzuführende Tätigkeiten", Docx4jWrapper.getBoldStyle());
         headerRowCol1Para1.getContent().add(descriptionLabel);
         R descriptionValue = Docx4jWrapper.generateRun(issue.getDescription());
         row1Col1Para1.getContent().add(descriptionValue);
-        
 
         return table;
     }
@@ -168,9 +166,9 @@ public class SprintReportTemplate extends DocumentTemplate {
         List<String> progressLabelList = filterProgressLabels(issue);
         String status = "";
         if (issue.getState().toString().equals("closed")) {
-            status = "Abgeschlossen";
+            status = "Abgeschlossen"; //Caption for closed issues
         } else if (issue.getState().toString().equals("opened") && progressLabelList.isEmpty()) {
-            status = "Offen";
+            status = "Offen"; //Caption for open issues
         } else {
             status = implode(progressLabelList, ", ");
         }
@@ -209,7 +207,7 @@ public class SprintReportTemplate extends DocumentTemplate {
         List<String> deliveryTypeLabelList = filterDeliverableTypeLabels(issue);
         String deliveryType = "";
         if (deliveryTypeLabelList.isEmpty()) {
-            deliveryType = "Nicht definiert!";
+            deliveryType = "Nicht definiert!"; //caption for issues without proper type label
         } else {
             deliveryType = implode(deliveryTypeLabelList, ", ");
         }
@@ -243,8 +241,6 @@ public class SprintReportTemplate extends DocumentTemplate {
 
         return table;
     }
-
-
 }
 
 
