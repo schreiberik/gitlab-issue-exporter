@@ -1,14 +1,15 @@
 package reportgenerator.word_export;
 
+import org.gitlab4j.api.models.*;
 import reportgenerator.gitlab_import.GitlabData;
 import org.docx4j.jaxb.Context;
 import org.docx4j.model.table.TblFactory;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.wml.*;
-import org.gitlab4j.api.models.Issue;
-import org.gitlab4j.api.models.Project;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -145,8 +146,34 @@ public class SprintReportTemplate extends DocumentTemplate {
         // Issue description / details
         R descriptionLabel = Docx4jWrapper.generateStyledRun("Durchzuführende Tätigkeiten", Docx4jWrapper.getBoldStyle());
         headerRowCol1Para1.getContent().add(descriptionLabel);
+
+        //add the actual description
         R descriptionValue = Docx4jWrapper.generateRun(issue.getDescription());
         row1Col1Para1.getContent().add(descriptionValue);
+
+        //add issue discussions
+        List<Discussion> discussions = gitlabData.getDiscussionsByIssueId().get(issue.getId());
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+
+        if (discussions != null && discussions.size() > 0) {
+            for (Discussion discussion : discussions) {
+
+                String discussionText = "";
+
+                for (Note note : discussion.getNotes()) {
+
+                    String author = note.getAuthor().getName();
+                    Date createdAt = note.getCreatedAt();
+                    String creationDateStr = "";
+                    if (createdAt != null)
+                        creationDateStr = formatter.format(createdAt);
+
+                    discussionText += note.getBody() + "[" + author + "@" + creationDateStr + "]\n\n";
+                    R discR = Docx4jWrapper.generateRun(discussionText);
+                    row1Col1Para1.getContent().add(discR);
+                }
+            }
+        }
 
         return table;
     }

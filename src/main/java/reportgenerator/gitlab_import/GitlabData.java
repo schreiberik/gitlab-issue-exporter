@@ -16,7 +16,7 @@ public class GitlabData {
 
     private Map<Project, List<Issue>> issuesByProject;
     private Map<Integer, List<Event>> eventsByProjectId;
-    private Map<Integer, Discussion> discussionsByIssueId;
+    private Map<Integer, List<Discussion>> discussionsByIssueId;
 
     /**
      * default constructor
@@ -33,7 +33,7 @@ public class GitlabData {
      * @param eventsByProjectId all imported event grouped by project id
      * @param discussionsByIssueId all imported discussions grouped by issue id
      */
-    public GitlabData(Map<Project, List<Issue>> issuesByProject, Map<Integer, List<Event>> eventsByProjectId, Map<Integer, Discussion> discussionsByIssueId) {
+    public GitlabData(Map<Project, List<Issue>> issuesByProject, Map<Integer, List<Event>> eventsByProjectId, Map<Integer, List<Discussion>> discussionsByIssueId) {
 
         this.issuesByProject = issuesByProject;
         this.eventsByProjectId = eventsByProjectId;
@@ -56,11 +56,11 @@ public class GitlabData {
         this.eventsByProjectId = eventsByProjectId;
     }
 
-    public Map<Integer, Discussion> getDiscussionsByIssueId() {
+    public Map<Integer, List<Discussion>> getDiscussionsByIssueId() {
         return discussionsByIssueId;
     }
 
-    public void setDiscussionsByIssueId(Map<Integer, Discussion> discussionsByIssueId) {
+    public void setDiscussionsByIssueId(Map<Integer, List<Discussion>> discussionsByIssueId) {
         this.discussionsByIssueId = discussionsByIssueId;
     }
 }

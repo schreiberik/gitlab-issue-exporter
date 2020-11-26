@@ -1,6 +1,7 @@
 package reportgenerator.gitlab_import;
 
 import ch.qos.logback.classic.Logger;
+import org.gitlab4j.api.DiscussionsApi;
 import reportgenerator.ReportGeneratorConfig;
 import org.gitlab4j.api.Constants;
 import org.gitlab4j.api.GitLabApi;
@@ -67,10 +68,23 @@ public class GitlabImporter {
 
                 if (project != null) {
 
-                    //get all issues of the project
+                    //Issues
                     List<Issue> issueList = getIssuesFromProject(project);
                     gitlabData.getIssuesByProject().put(project, issueList);
 
+
+                    //Discussions
+                    logger.info("Scanning for discussions...");
+
+                    for (Issue issue : issueList) {
+                        List<Discussion> discussions = getDiscussions(project, issue.getId());
+                        if (discussions != null && discussions.size() > 0) {
+                            gitlabData.getDiscussionsByIssueId().put(issue.getId(), discussions);
+                        }
+                    }
+                    logger.info("Retrieved discussions for " + gitlabData.getDiscussionsByIssueId().size() + " issues in project " + project.getName());
+
+                    //Events
                     List<Event> events = new ArrayList<>();
 
                     //get all events that where newly created within the given time frame
@@ -111,7 +125,9 @@ public class GitlabImporter {
     public List<Issue> getIssuesFromProject(Project project) throws GitLabApiException {
 
         List<Issue> issueList = gitLabApi.getIssuesApi().getIssues(project.getId(), importSettings.getUpdateFilter());
-        logger.info("Retrieved " + issueList.size() + " issues for project " + project.getName());
+
+        if (issueList.size() > 0)
+            logger.info("Retrieved " + issueList.size() + " issues for project " + project.getName());
 
         return issueList;
     }
@@ -173,7 +189,8 @@ public class GitlabImporter {
             e.printStackTrace();
         }
 
-        logger.info("Retrieved " + projectEvents.size() + " events with type \"" + actionType.toValue() + "\" for project " + project.getName());
+        if (projectEvents.size() > 0)
+            logger.info("Retrieved " + projectEvents.size() + " events with type \"" + actionType.toValue() + "\" for project " + project.getName());
 
         return projectEvents;
     }
@@ -190,12 +207,13 @@ public class GitlabImporter {
         List<Discussion> issueDiscussions = new ArrayList<>();
 
         try {
-            issueDiscussions = gitLabApi.getDiscussionsApi().getIssueDiscussions(project.getId(), issueID);
+            DiscussionsApi discussionsApi = gitLabApi.getDiscussionsApi();
+            issueDiscussions = discussionsApi.getIssueDiscussions(project.getId(), issueID);
+            logger.info("Retrieved " + issueDiscussions.size() + " discussions for issue " + issueID + " in project " + project.getName());
         } catch (GitLabApiException e) {
-            e.printStackTrace();
+            //this is required here because gitlab api seems to mess up some of the issue ids and provides invalid ids at some point
+            logger.debug("Skipping issue " + issueID + " of project " + project.getName() + " due to GitLabApi Exception.");
         }
-
-        logger.info("Retrieved " + issueDiscussions.size() + " for project " + project.getName());
 
         return issueDiscussions;
     }

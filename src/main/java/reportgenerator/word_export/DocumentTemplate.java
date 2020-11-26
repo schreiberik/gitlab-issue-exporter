@@ -57,7 +57,8 @@ public abstract class DocumentTemplate {
         try {
             wordprocessingMLPackage.save(exportFile);
         } catch (Docx4JException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            logger.error("Error while saving the document. Are there previously generated while that are opened in an application?");
         }
     }
 

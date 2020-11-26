@@ -4,9 +4,8 @@ import reportgenerator.gitlab_import.GitlabData;
 import reportgenerator.gitlab_import.GitlabImporter;
 import reportgenerator.word_export.DocumentGenerator;
 
-//ToDo: Einbeziehung von Issues die während des Zeitraumes geupdated wurden (Commits, Kommentare, etc.)
-//ToDo: JUnit Tests???
-//ToDo: Code Cleanup (Imports, Methoden, JavaDoc, etc.)
+//ToDo: Support Markdown Formatting in Issue Description
+//ToDo: Integrate all associated members (not only the Assignee)
 
 /**
  * Application main class
