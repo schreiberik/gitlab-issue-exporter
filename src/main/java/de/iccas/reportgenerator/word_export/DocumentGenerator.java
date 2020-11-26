@@ -12,17 +12,34 @@ public class DocumentGenerator {
 
     private ObjectFactory objectFactory;
     private WordprocessingMLPackage wordprocessingMLPackage;
-    private SprintReportTemplate sprintReportTemplate;
+    private DocumentTemplate sprintReportTemplate;
 
     protected final ch.qos.logback.classic.Logger logger = (Logger) LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    public DocumentGenerator(GitlabData gitlabData) throws InvalidFormatException {
+    /**getSimpleName
+     * generates a report document from the data imported from GitLab
+     */
+    public DocumentGenerator() {
 
-        objectFactory = Context.getWmlObjectFactory();
-        wordprocessingMLPackage = WordprocessingMLPackage.createPackage();
-        sprintReportTemplate = new SprintReportTemplate(wordprocessingMLPackage, gitlabData);
-        sprintReportTemplate.generateDocument();
-        sprintReportTemplate.generateReportFile("Sprintbericht.docx");
+        //prepare docx4j
+        try {
+            objectFactory = Context.getWmlObjectFactory();
+            wordprocessingMLPackage = WordprocessingMLPackage.createPackage();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     *
+     * @param gitlabData the imported data from GitLab
+     * @param fileName the name of the file to be generated
+     */
+    public void generateDocument(GitlabData gitlabData, String fileName)
+    {
+        //generate the actual report document from the template
+        sprintReportTemplate = new SprintReportTemplate(wordprocessingMLPackage, gitlabData);
+        sprintReportTemplate.generateDocument();
+        sprintReportTemplate.generateReportFile(fileName);
+    }
 }
