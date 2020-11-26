@@ -10,6 +10,11 @@ public class Docx4jWrapper {
 
     private static ObjectFactory objectFactory = Context.getWmlObjectFactory();
 
+    /**
+     * genereate a docx4j run from a string
+     * @param string the string to be converted to a run
+     * @return the run object
+     */
     public static R generateRun(String string) {
 
         if (string == null || string.isEmpty() || string.equals("null"))
@@ -23,6 +28,11 @@ public class Docx4jWrapper {
         return run;
     }
 
+    /**
+     * genereate a docx4j run from a string array
+     * @param strings the string array to be converted to a run
+     * @return the run object
+     */
     public static R generateRun(String[] strings) {
 
         R run = objectFactory.createR();
@@ -36,6 +46,12 @@ public class Docx4jWrapper {
         return run;
     }
 
+    /**
+     * genereate a docx4j run from a string
+     * @param string the string to be converted to a run
+     * @param rpr the styling that will be applied onto the run
+     * @return the run object
+     */
     public static R generateStyledRun(String string, RPr rpr) {
         R run = generateRun(string);
         run.setRPr(rpr);
@@ -43,6 +59,12 @@ public class Docx4jWrapper {
         return run;
     }
 
+    /**
+     * genereate a docx4j run from a string array
+     * @param strings the string array to be converted to a run
+     * @param rpr the styling that will be applied onto the runs
+     * @return the run object
+     */
     public static R generateStyledRun(String[] strings, RPr rpr) {
         R run = generateRun(strings);
         run.setRPr(rpr);
