@@ -1,4 +1,4 @@
-package de.iccas.reportgenerator.gitlab_import;
+package reportgenerator.gitlab_import;
 
 import org.gitlab4j.api.models.Discussion;
 import org.gitlab4j.api.models.Event;

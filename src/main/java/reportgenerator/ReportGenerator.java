@@ -1,8 +1,8 @@
-package de.iccas.reportgenerator;
+package reportgenerator;
 
-import de.iccas.reportgenerator.gitlab_import.GitlabData;
-import de.iccas.reportgenerator.gitlab_import.GitlabImporter;
-import de.iccas.reportgenerator.word_export.DocumentGenerator;
+import reportgenerator.gitlab_import.GitlabData;
+import reportgenerator.gitlab_import.GitlabImporter;
+import reportgenerator.word_export.DocumentGenerator;
 
 //ToDo: Einbeziehung von Issues die während des Zeitraumes geupdated wurden (Commits, Kommentare, etc.)
 //ToDo: JUnit Tests???

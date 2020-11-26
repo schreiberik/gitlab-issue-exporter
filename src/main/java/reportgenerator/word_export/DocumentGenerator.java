@@ -1,7 +1,7 @@
-package de.iccas.reportgenerator.word_export;
+package reportgenerator.word_export;
 
 import ch.qos.logback.classic.Logger;
-import de.iccas.reportgenerator.gitlab_import.GitlabData;
+import reportgenerator.gitlab_import.GitlabData;
 import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;

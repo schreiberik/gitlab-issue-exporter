@@ -1,6 +1,6 @@
-package de.iccas.reportgenerator.word_export;
+package reportgenerator.word_export;
 
-import de.iccas.reportgenerator.gitlab_import.GitlabData;
+import reportgenerator.gitlab_import.GitlabData;
 import org.docx4j.jaxb.Context;
 import org.docx4j.model.table.TblFactory;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;

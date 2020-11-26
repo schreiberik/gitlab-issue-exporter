@@ -1,7 +1,7 @@
-package de.iccas.reportgenerator.gitlab_import;
+package reportgenerator.gitlab_import;
 
 import ch.qos.logback.classic.Logger;
-import de.iccas.reportgenerator.ReportGeneratorConfig;
+import reportgenerator.ReportGeneratorConfig;
 import org.gitlab4j.api.Constants;
 import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;

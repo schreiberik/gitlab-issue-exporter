@@ -1,6 +1,6 @@
-package de.iccas.reportgenerator.gitlab_import;
+package reportgenerator.gitlab_import;
 
-import de.iccas.reportgenerator.ReportGeneratorConfig;
+import reportgenerator.ReportGeneratorConfig;
 import org.gitlab4j.api.models.IssueFilter;
 
 import java.text.ParseException;

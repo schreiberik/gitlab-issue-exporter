@@ -1,4 +1,4 @@
-package de.iccas.reportgenerator.word_export;
+package reportgenerator.word_export;
 
 import org.docx4j.jaxb.Context;
 import org.docx4j.wml.*;
