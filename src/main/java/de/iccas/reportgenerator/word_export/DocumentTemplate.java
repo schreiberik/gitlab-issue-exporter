@@ -152,4 +152,14 @@ public abstract class DocumentTemplate {
         return Math.round((seconds / 60) / 60);
     }
 
+    /**
+     * calucates the cell width twips according to the numbers of table columns
+     * @param tableColumns the amount of columns in the table
+     * @return the cell width twips
+     */
+    protected int getCellWidthTwipsForTable(int tableColumns)
+    {
+        int cellWidthTwips = Double.valueOf(Math.floor(writableWidthTwips /  tableColumns)).intValue();
+        return cellWidthTwips;
+    }
 }

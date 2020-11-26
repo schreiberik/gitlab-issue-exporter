@@ -78,7 +78,7 @@ public class SprintReportTemplate extends DocumentTemplate {
         int rows = 2;
         int columns = 3;
 
-        int cellWidthTwips = new Double(Math.floor(writableWidthTwips / columns)).intValue();
+        int cellWidthTwips = getCellWidthTwipsForTable(columns);
         Tbl table = TblFactory.createTable(rows, columns, cellWidthTwips);
         logger.debug("Creating table. Rows: " + rows + " Columns: " + columns + " Cell Width Twips: " + cellWidthTwips);
 
@@ -131,7 +131,7 @@ public class SprintReportTemplate extends DocumentTemplate {
         int rows = 2;
         int columns = 1;
 
-        int cellWidthTwips = new Double(Math.floor(writableWidthTwips / columns)).intValue();
+        int cellWidthTwips = getCellWidthTwipsForTable(columns);
         Tbl table = TblFactory.createTable(rows, columns, cellWidthTwips);
 
         //get table header structure
@@ -164,7 +164,7 @@ public class SprintReportTemplate extends DocumentTemplate {
 
         //Filter labels that are not used to describe progress and translate progress related labels
         List<String> progressLabelList = filterProgressLabels(issue);
-        String status = "";
+        String status;
         if (issue.getState().toString().equals("closed")) {
             status = "Abgeschlossen"; //Caption for closed issues
         } else if (issue.getState().toString().equals("opened") && progressLabelList.isEmpty()) {
@@ -173,7 +173,7 @@ public class SprintReportTemplate extends DocumentTemplate {
             status = implode(progressLabelList, ", ");
         }
 
-        int cellWidthTwips = new Double(Math.floor(writableWidthTwips / columns)).intValue();
+        int cellWidthTwips = getCellWidthTwipsForTable(columns);
         Tbl table = TblFactory.createTable(rows, columns, cellWidthTwips);
 
         //get table header structure
@@ -205,14 +205,14 @@ public class SprintReportTemplate extends DocumentTemplate {
 
         //Filter labels that are not used to describe the deliverable type and mark issues without according labels
         List<String> deliveryTypeLabelList = filterDeliverableTypeLabels(issue);
-        String deliveryType = "";
+        String deliveryType;
         if (deliveryTypeLabelList.isEmpty()) {
             deliveryType = "Nicht definiert!"; //caption for issues without proper type label
         } else {
             deliveryType = implode(deliveryTypeLabelList, ", ");
         }
 
-        int cellWidthTwips = new Double(Math.floor(writableWidthTwips / columns)).intValue();
+        int cellWidthTwips = getCellWidthTwipsForTable(columns);
         Tbl table = TblFactory.createTable(rows, columns, cellWidthTwips);
 
         //get table header structure
